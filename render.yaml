@@ -1,15 +1,15 @@
 services:
-  # Laravel backend
   - type: web
-    name: laravel-backend
-    runtime: php
+    name: laravel-vite-app
+    env: docker
     plan: free
     buildCommand: |
+      npm install --prefix frontend
+      npm run build --prefix frontend
+      cp -r frontend/dist/* public/
       composer install --no-dev --optimize-autoloader
       php artisan key:generate
       php artisan config:cache
-      php artisan route:cache
-      php artisan view:cache
     startCommand: php artisan serve --host 0.0.0.0 --port $PORT
     envVars:
       - key: APP_ENV
@@ -19,19 +19,4 @@ services:
       - key: APP_KEY
         generateValue: true
       - key: APP_URL
-        value: https://laravel-backend.onrender.com
-      - key: DB_CONNECTION
-        value: sqlite
-
-  # Vite frontend
-  - type: web
-    name: vite-frontend
-    runtime: node
-    plan: free
-    buildCommand: |
-      npm install
-      npm run build
-    startCommand: npm run preview -- --port $PORT
-    envVars:
-      - key: VITE_API_URL
-        value: https://laravel-backend.onrender.com
+        value: https://laravel-vite-app.onrender.com
